@@ -17,59 +17,62 @@ def get-localized [key: string, locale: string] {
     $in | get (localized-key $key $locale)
 }
 
-def get-hashes [category: string] {
-    $LOCALES | reduce -f {} { |locale, acc| insert $locale (open -r ($base_dir | path join $locale $"($category).json") | hash sha256) }
+def parse-question [locale: string] {
+    let q = $in
+    let type = match $q."Zakres struktury" {
+        "PODSTAWOWY" => "basic"
+        "SPECJALISTYCZNY" => "specialist"
+    }
+    let media = match $q.Media {
+        "" => null
+        _ => $q.Media
+    }
+    let media_type = if $media == null { null } else {
+        match ($media | path parse | get extension) {
+            "jpg" => "image"
+            "wmv" => "video"
+            _ => null
+        }
+    }
+
+    let base = {
+        id: ($q."Numer pytania" | into int)
+        categories: $q.Kategorie
+        type: $type,
+        q: ($q | get-localized "Pytanie" $locale)
+        correct: $q."Poprawna odp"
+        media: $media
+        media_type: $media_type
+        points: ($q."Liczba punktów" | into int)
+    }
+    let specialist_answers = if $type == "specialist" {
+        {
+            a: ($q | get-localized "Odpowiedź A" $locale)
+            b: ($q | get-localized "Odpowiedź B" $locale)
+            c: ($q | get-localized "Odpowiedź C" $locale)
+        }
+    } else {
+        {}
+    }
+    { ...$base, ...$specialist_answers }
+}
+
+def get-hashes [] {
+    $LOCALES | reduce -f {} { |locale, acc|
+        insert $locale (open -r ($base_dir | path join $"($locale).json") | hash sha256)
+    }
 }
 
 let questions = http get $FILE_URL | from xlsx --prefer-integers --sheets [katalog] | get katalog | where Kategorie != null | update Kategorie { split row "," | str trim | where $it != "" }
 
-let categories = $questions | get Kategorie | flatten | str join "," | split row "," | str trim | where $it != "" | uniq
-
 let grouped = $questions | flatten Kategorie | group-by Kategorie
 
-$LOCALES | par-each { |locale|
-    let base_dir = $base_dir | path join $locale
-    mkdir $base_dir
-    $grouped | items { |category, questions|
-        let parsed_questions = $questions | each { |q|
-            let type = match $q."Zakres struktury" {
-                "PODSTAWOWY" => "basic"
-                "SPECJALISTYCZNY" => "specialist"
-            }
-            let media = match $q.Media {
-                "" => null
-                _ => $q.Media
-            }
-            let media_type = if $media == null { null } else {
-                match ($media | path parse | get extension) {
-                    "jpg" => "image"
-                    "wmv" => "video"
-                    _ => null
-                }
-            }
+mkdir $base_dir
 
-            let base = {
-                id: ($q."Numer pytania" | into int)
-                type: $type,
-                q: ($q | get-localized "Pytanie" $locale)
-                correct: $q."Poprawna odp"
-                media: $media
-                media_type: $media_type
-                points: ($q."Liczba punktów" | into int)
-            }
-            let specialist_answers = if $type == "specialist" {
-                {
-                    a: ($q | get-localized "Odpowiedź A" $locale)
-                    b: ($q | get-localized "Odpowiedź B" $locale)
-                    c: ($q | get-localized "Odpowiedź C" $locale)
-                }
-            } else {
-                {}
-            }
-            { ...$base, ...$specialist_answers }
-        }
-        $parsed_questions | to json --raw | save -f ($base_dir | path join $"($category).json")
-    }
+$LOCALES | par-each { |locale|
+    let database = $questions | each { parse-question $locale } | sort-by id
+
+    $database | to json --raw | save -f ($base_dir | path join $"($locale).json")
 }
 
 let category_stats = $grouped | items { |category, questions|
@@ -78,11 +81,11 @@ let category_stats = $grouped | items { |category, questions|
         questions_count: ($questions | length)
         basic_count: ($questions | where "Zakres struktury" == "PODSTAWOWY" | length)
         specialist_count: ($questions | where "Zakres struktury" == "SPECJALISTYCZNY" | length)
-        hashes: (get-hashes $category)
     }
 } | sort-by name
 
 let manifest = {
+    hashes: (get-hashes)
     categories: $category_stats
 }
 

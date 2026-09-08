@@ -4,6 +4,8 @@
 const FILE_URL = "https://www.gov.pl/attachment/a5c6c329-28a5-4274-a1a8-e2813f0a51bd"
 const LOCALES = [PL, EN, D, UA]
 
+let base_dir = "questions"
+
 def localized-key [key: string, locale: string] {
     if $locale == "PL" {
         return $key
@@ -15,13 +17,15 @@ def get-localized [key: string, locale: string] {
     $in | get (localized-key $key $locale)
 }
 
+def get-hashes [category: string] {
+    $LOCALES | reduce -f {} { |locale, acc| insert $locale (open -r ($base_dir | path join $locale $"($category).json") | hash sha256) }
+}
+
 let questions = http get $FILE_URL | from xlsx --prefer-integers --sheets [katalog] | get katalog | where Kategorie != null | update Kategorie { split row "," | str trim | where $it != "" }
 
 let categories = $questions | get Kategorie | flatten | str join "," | split row "," | str trim | where $it != "" | uniq
 
 let grouped = $questions | flatten Kategorie | group-by Kategorie
-
-let base_dir = "questions"
 
 $LOCALES | par-each { |locale|
     let base_dir = $base_dir | path join $locale
@@ -74,6 +78,7 @@ let category_stats = $grouped | items { |category, questions|
         questions_count: ($questions | length)
         basic_count: ($questions | where "Zakres struktury" == "PODSTAWOWY" | length)
         specialist_count: ($questions | where "Zakres struktury" == "SPECJALISTYCZNY" | length)
+        hashes: (get-hashes $category)
     }
 } | sort-by name
 

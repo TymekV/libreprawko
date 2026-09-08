@@ -21,8 +21,10 @@ let categories = $questions | get Kategorie | flatten | str join "," | split row
 
 let grouped = $questions | flatten Kategorie | group-by Kategorie
 
+let base_dir = "questions"
+
 $LOCALES | par-each { |locale|
-    let base_dir = "questions" | path join $locale
+    let base_dir = $base_dir | path join $locale
     mkdir $base_dir
     $grouped | items { |category, questions|
         let parsed_questions = $questions | each { |q|
@@ -65,5 +67,20 @@ $LOCALES | par-each { |locale|
         $parsed_questions | to json --raw | save -f ($base_dir | path join $"($category).json")
     }
 }
+
+let category_stats = $grouped | items { |category, questions|
+    {
+        name: $category,
+        questions_count: ($questions | length)
+        basic_count: ($questions | where "Zakres struktury" == "PODSTAWOWY" | length)
+        specialist_count: ($questions | where "Zakres struktury" == "SPECJALISTYCZNY" | length)
+    }
+}
+
+let manifest = {
+    categories: $category_stats
+}
+
+$manifest | to json --raw | save -f ($base_dir | path join "manifest.json")
 
 echo "Done"

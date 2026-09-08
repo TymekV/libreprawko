@@ -32,5 +32,8 @@ fun AppEntry(backStack: NavBackStack<NavKey>) {
                 }
             }
         },
+        transitionSpec = { forwardTransition() },
+        popTransitionSpec = { popTransition() },
+        predictivePopTransitionSpec = { popTransition() },
     )
 }

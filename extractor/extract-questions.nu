@@ -75,7 +75,7 @@ let category_stats = $grouped | items { |category, questions|
         basic_count: ($questions | where "Zakres struktury" == "PODSTAWOWY" | length)
         specialist_count: ($questions | where "Zakres struktury" == "SPECJALISTYCZNY" | length)
     }
-}
+} | sort-by name
 
 let manifest = {
     categories: $category_stats

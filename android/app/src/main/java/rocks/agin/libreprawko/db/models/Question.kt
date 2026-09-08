@@ -1,5 +1,6 @@
-package rocks.agin.libreprawko.models
+package rocks.agin.libreprawko.db.models
 
+import androidx.room3.ColumnInfo
 import androidx.room3.ColumnTypeConverter
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
@@ -34,11 +35,10 @@ class MediaTypeConverter {
 
 @Entity(tableName = "questions")
 data class Question(
-    @PrimaryKey
-    val id: Int,
+    @PrimaryKey val id: Int,
     val type: QuestionType,
-    val correctAnswer: String,
+    @ColumnInfo(name = "correct_answer") val correctAnswer: String,
     val media: String?,
-    val mediaType: MediaType?,
+    @ColumnInfo(name = "media_type") val mediaType: MediaType?,
     val points: Int,
 )

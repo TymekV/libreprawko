@@ -1,4 +1,4 @@
-package rocks.agin.libreprawko.models
+package rocks.agin.libreprawko.db.models
 
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey

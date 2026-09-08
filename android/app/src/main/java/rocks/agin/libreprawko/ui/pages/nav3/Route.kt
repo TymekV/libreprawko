@@ -5,7 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Route : NavKey {
-    @Serializable data object Home : Route
+    @Serializable
+    data object Home : Route
 
-    @Serializable data object Question : Route
+    @Serializable
+    data class Question(
+        val questionId: Int,
+    ) : Route
 }

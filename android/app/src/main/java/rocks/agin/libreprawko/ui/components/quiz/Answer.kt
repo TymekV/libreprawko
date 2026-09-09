@@ -6,9 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +42,13 @@ fun Answer(
 ) {
     val haptic = LocalHapticFeedback.current
 
+    val contentsColor =
+        if (selected) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSurface
+        }
+
     val onClickAction = {
         haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
         onOptionSelected()
@@ -70,26 +78,24 @@ fun Answer(
                     "$answerLetter.",
                     style = MaterialTheme.typography.labelLarge.merge(fontWeight = FontWeight.Bold),
                     color =
-                        if (selected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        },
+                    contentsColor,
                 )
             }
             EmphasizedText(
                 text,
                 emphasized = selected,
                 style = MaterialTheme.typography.labelLarge,
-                color =
-                    if (selected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
+                color = contentsColor,
             )
         }
-        Checkbox(selected, onCheckedChange = null)
+        RadioButton(
+            selected,
+            onClick = null,
+            colors =
+                RadioButtonDefaults.colors(
+                    selectedColor = contentsColor,
+                ),
+        )
     }
 }
 

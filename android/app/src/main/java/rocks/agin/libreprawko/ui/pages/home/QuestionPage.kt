@@ -12,8 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import rocks.agin.libreprawko.ui.components.core.containers.RoundedCardContainer
 import rocks.agin.libreprawko.ui.components.quiz.Answer
-import rocks.agin.libreprawko.ui.components.quiz.core.containers.RoundedCardContainer
 
 @Composable
 fun QuestionPage() {

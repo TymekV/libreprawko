@@ -1,4 +1,4 @@
-package rocks.agin.libreprawko.ui.components.quiz.core.containers
+package rocks.agin.libreprawko.ui.components.core.containers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

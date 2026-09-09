@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 fun RoundedCardContainer(
     modifier: Modifier = Modifier,
     spacing: Dp = 2.dp,
-    cornerRadius: Dp = 24.dp,
+    cornerRadius: Dp = 20.dp,
     containerColor: Color = Color.Transparent,
     content: @Composable ColumnScope.() -> Unit,
 ) {

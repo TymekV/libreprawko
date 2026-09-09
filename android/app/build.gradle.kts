@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.androidx.room3.runtime)
     implementation(libs.androidx.sqlite.bundled)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
     ksp(libs.androidx.room3.compiler)
     ksp(libs.hilt.compiler)
 }

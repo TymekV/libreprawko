@@ -3,6 +3,8 @@ package rocks.agin.libreprawko.ui.components.quiz
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -12,6 +14,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,17 +45,22 @@ fun Answer(
 ) {
     val haptic = LocalHapticFeedback.current
 
+    val interactionSource = remember { MutableInteractionSource() }
+
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Press) {
+                haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
+            }
+        }
+    }
+
     val contentsColor =
         if (selected) {
             MaterialTheme.colorScheme.onPrimaryContainer
         } else {
             MaterialTheme.colorScheme.onSurface
         }
-
-    val onClickAction = {
-        haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
-        onOptionSelected()
-    }
 
     Row(
         modifier =
@@ -64,7 +72,7 @@ fun Answer(
                     } else {
                         MaterialTheme.colorScheme.surfaceContainerHigh
                     },
-                ).clickable(onClick = onClickAction)
+                ).clickable(onClick = onOptionSelected, interactionSource = interactionSource)
                 .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,

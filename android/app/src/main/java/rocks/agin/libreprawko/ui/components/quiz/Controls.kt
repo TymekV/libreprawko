@@ -81,7 +81,7 @@ fun Controls(
                     onClick = {},
                     modifier = previousModifier,
                     interactionSource = previousInteractionSource,
-                    shape = MaterialTheme.shapes.large,
+                    shape = RoundedCornerShape(20.dp),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -100,7 +100,7 @@ fun Controls(
                     onClick = {},
                     modifier = nextModifier,
                     interactionSource = nextInteractionSource,
-                    shape = MaterialTheme.shapes.large,
+                    shape = RoundedCornerShape(20.dp),
                 ) {
                     when (mode) {
                         Mode.Next -> {

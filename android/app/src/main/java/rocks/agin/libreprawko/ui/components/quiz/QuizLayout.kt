@@ -9,6 +9,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,88 +40,102 @@ fun QuizLayout() {
     var checkShown by remember { mutableStateOf(false) }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.padding(bottom = 14.dp, top = 6.dp),
+        modifier = Modifier.padding(top = 6.dp),
     ) {
-        QuizHeader(modifier = Modifier.padding(end = 18.dp))
-
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(horizontal = 18.dp),
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
+            QuizHeader(modifier = Modifier.padding(end = 18.dp))
+
             Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                modifier = Modifier.padding(top = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(horizontal = 18.dp),
             ) {
-                Text(
-                    "Nr pytania: 6333 • 3 punkty",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.padding(top = 6.dp),
+                ) {
+                    Text(
+                        "Nr pytania: 6333 • 3 punkty",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
 
-                Text(
-                    "Z jaką maksymalną dopuszczalną prędkością możesz jechać na drodze za tym znakiem?",
-                    style =
-                        MaterialTheme.typography.titleLarge.merge(
-                            fontWeight = FontWeight.Medium,
-                        ),
-                )
+                    Text(
+                        "Z jaką maksymalną dopuszczalną prędkością możesz jechać na drodze za tym znakiem?",
+                        style =
+                            MaterialTheme.typography.titleLarge.merge(
+                                fontWeight = FontWeight.Medium,
+                            ),
+                    )
+                }
+
+                QuizImage(modifier = Modifier.weight(1f))
+
+                RoundedCardContainer {
+                    Answer(
+                        text = "20 km/h",
+                        selected = selected == 0,
+                        onOptionSelected = { selected = 0 },
+                        answerLetter = "A",
+                    )
+                    Answer(
+                        text = "30 km/h",
+                        selected = selected == 1,
+                        onOptionSelected = { selected = 1 },
+                        answerLetter = "B",
+                    )
+                    Answer(
+                        text = "40 km/h",
+                        selected = selected == 2,
+                        onOptionSelected = { selected = 2 },
+                        answerLetter = "C",
+                    )
+                }
             }
 
-            QuizImage(modifier = Modifier.weight(1f))
+        }
 
-            RoundedCardContainer {
-                Answer(
-                    text = "20 km/h",
-                    selected = selected == 0,
-                    onOptionSelected = { selected = 0 },
-                    answerLetter = "A",
-                )
-                Answer(
-                    text = "30 km/h",
-                    selected = selected == 1,
-                    onOptionSelected = { selected = 1 },
-                    answerLetter = "B",
-                )
-                Answer(
-                    text = "40 km/h",
-                    selected = selected == 2,
-                    onOptionSelected = { selected = 2 },
-                    answerLetter = "C",
-                )
-            }
+        val density = LocalDensity.current
+        val bottomInset = WindowInsets.navigationBars.getBottom(density)
+        val margin = with(density) { 14.dp.roundToPx() }
 
-
-            val density = LocalDensity.current
-            val bottomInset = WindowInsets.navigationBars.getBottom(density)
-            val margin = with(density) { 14.dp.roundToPx() }
-
-            AnimatedContent(
-                targetState = checkShown,
-                contentAlignment = Alignment.BottomCenter,
-                transitionSpec = {
-                    val spec = if (targetState) {
-                        slideInVertically(tween(350)) { it + margin + bottomInset } togetherWith
-                            fadeOut(tween(200))
-                    } else {
-                        fadeIn(tween(250, delayMillis = 150)) togetherWith
-                            slideOutVertically(tween(350)) { it + margin + bottomInset }
-                    }
-                    spec.apply { targetContentZIndex = if (targetState) 1f else -1f }
-                        .using(SizeTransform(clip = false))
-                },
-            ) { isExpanded ->
-                if (isExpanded) {
+        AnimatedContent(
+            targetState = checkShown,
+            contentAlignment = Alignment.BottomCenter,
+            transitionSpec = {
+                val spec = if (targetState) {
+                    slideInVertically(tween(350)) { it + margin + bottomInset } togetherWith
+                        fadeOut(tween(200))
+                } else {
+                    fadeIn(tween(250, delayMillis = 150)) togetherWith
+                        slideOutVertically(tween(350)) { it + margin + bottomInset }
+                }
+                spec.apply { targetContentZIndex = if (targetState) 1f else -1f }
+                    .using(SizeTransform(clip = false))
+            },
+        ) { isExpanded ->
+            if (isExpanded) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp)
+                ) {
                     QuizCheck(
                         result = QuestionResult.Correct(0),
                         onNext = {
                             checkShown = !checkShown
                         },
-                        modifier = Modifier.align(
-                            Alignment.CenterHorizontally
-                        )
                     )
-                } else {
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp)
+                        .padding(top = 12.dp, bottom = 14.dp)
+                ) {
                     Controls(
                         onPrevious = {},
                         onNext = {

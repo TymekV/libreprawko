@@ -1,9 +1,19 @@
 package rocks.agin.libreprawko.ui.components.quiz
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import rocks.agin.libreprawko.quiz.QuestionResult
@@ -79,22 +90,46 @@ fun QuizLayout() {
                 )
             }
 
-            Controls(
-                onPrevious = {},
-                onNext = {
-                    checkShown = !checkShown
-                },
-                visible = !checkShown,
-                mode = Mode.Check
-            )
 
-            QuizCheck(
-                visible = checkShown,
-                result = QuestionResult.Correct(0),
-                modifier = Modifier.align(
-                    Alignment.CenterHorizontally
-                )
-            )
+            val density = LocalDensity.current
+            val bottomInset = WindowInsets.navigationBars.getBottom(density)
+            val margin = with(density) { 14.dp.roundToPx() }
+
+            AnimatedContent(
+                targetState = checkShown,
+                contentAlignment = Alignment.BottomCenter,
+                transitionSpec = {
+                    val spec = if (targetState) {
+                        slideInVertically(tween(350)) { it + margin + bottomInset } togetherWith
+                            fadeOut(tween(200))
+                    } else {
+                        fadeIn(tween(250, delayMillis = 150)) togetherWith
+                            slideOutVertically(tween(350)) { it + margin + bottomInset }
+                    }
+                    spec.apply { targetContentZIndex = if (targetState) 1f else -1f }
+                        .using(SizeTransform(clip = false))
+                },
+            ) { isExpanded ->
+                if (isExpanded) {
+                    QuizCheck(
+                        result = QuestionResult.Correct(0),
+                        onNext = {
+                            checkShown = !checkShown
+                        },
+                        modifier = Modifier.align(
+                            Alignment.CenterHorizontally
+                        )
+                    )
+                } else {
+                    Controls(
+                        onPrevious = {},
+                        onNext = {
+                            checkShown = !checkShown
+                        },
+                        mode = Mode.Check
+                    )
+                }
+            }
         }
     }
 }

@@ -11,16 +11,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import rocks.agin.libreprawko.quiz.QuestionResult
 import rocks.agin.libreprawko.ui.components.core.containers.RoundedCardContainer
 
 @Composable
 fun QuizLayout() {
     var selected by remember { mutableIntStateOf(0) }
+
+    var checkShown by remember { mutableStateOf(false) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -74,7 +79,22 @@ fun QuizLayout() {
                 )
             }
 
-            Controls(onPrevious = {}, onNext = {}, mode = Mode.Check)
+            Controls(
+                onPrevious = {},
+                onNext = {
+                    checkShown = !checkShown
+                },
+                visible = !checkShown,
+                mode = Mode.Check
+            )
+
+            QuizCheck(
+                visible = checkShown,
+                result = QuestionResult.Correct(0),
+                modifier = Modifier.align(
+                    Alignment.CenterHorizontally
+                )
+            )
         }
     }
 }

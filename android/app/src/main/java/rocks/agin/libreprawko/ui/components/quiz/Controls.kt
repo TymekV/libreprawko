@@ -1,5 +1,9 @@
 package rocks.agin.libreprawko.ui.components.quiz
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +44,7 @@ enum class Mode {
 fun Controls(
     onPrevious: () -> Unit,
     onNext: () -> Unit,
+    visible: Boolean = true,
     mode: Mode,
 ) {
     val previousInteractionSource = remember { MutableInteractionSource() }
@@ -62,69 +67,89 @@ fun Controls(
         }
     }
 
-    ButtonGroup(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        overflowIndicator = { // won't trigger, but still required
-            menuState ->
-            ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
-        },
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(300)),
+        exit = fadeOut(tween(300))
     ) {
-        val previousModifier =
-            Modifier.weight(1f).animateWidth(previousInteractionSource).fillMaxHeight()
-        customItem(
-            buttonGroupContent = {
-                FilledTonalButton(
-                    onClick = {},
-                    modifier = previousModifier,
-                    interactionSource = previousInteractionSource,
-                    shape = RoundedCornerShape(20.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = null,
-                    )
-                }
+        ButtonGroup(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            overflowIndicator = { // won't trigger, but still required
+                    menuState ->
+                ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
             },
-            menuContent = { DropdownMenuItem(text = { Text("Poprzednie pytanie") }, onClick = {}) },
-        )
+        ) {
+            val previousModifier =
+                Modifier
+                    .weight(1f)
+                    .animateWidth(previousInteractionSource)
+                    .fillMaxHeight()
+            customItem(
+                buttonGroupContent = {
+                    FilledTonalButton(
+                        onClick = onPrevious,
+                        modifier = previousModifier,
+                        interactionSource = previousInteractionSource,
+                        shape = RoundedCornerShape(20.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = null,
+                        )
+                    }
+                },
+                menuContent = {
+                    DropdownMenuItem(
+                        text = { Text("Poprzednie pytanie") },
+                        onClick = {})
+                },
+            )
 
-        val nextModifier =
-            Modifier.weight(2f).animateWidth(nextInteractionSource).fillMaxHeight()
-        customItem(
-            buttonGroupContent = {
-                Button(
-                    onClick = {},
-                    modifier = nextModifier,
-                    interactionSource = nextInteractionSource,
-                    shape = RoundedCornerShape(20.dp),
-                ) {
-                    when (mode) {
-                        Mode.Next -> {
-                            Text("Następne")
-                            Spacer(Modifier.width(8.dp))
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-                                contentDescription = null,
-                            )
-                        }
+            val nextModifier =
+                Modifier
+                    .weight(2f)
+                    .animateWidth(nextInteractionSource)
+                    .fillMaxHeight()
+            customItem(
+                buttonGroupContent = {
+                    Button(
+                        onClick = onNext,
+                        modifier = nextModifier,
+                        interactionSource = nextInteractionSource,
+                        shape = RoundedCornerShape(20.dp),
+                    ) {
+                        when (mode) {
+                            Mode.Next -> {
+                                Text("Następne")
+                                Spacer(Modifier.width(8.dp))
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                                    contentDescription = null,
+                                )
+                            }
 
-                        Mode.Check -> {
-                            Icon(
-                                imageVector = Icons.Rounded.Check,
-                                contentDescription = null,
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text("Sprawdź")
-                            Spacer(Modifier.width(8.dp))
+                            Mode.Check -> {
+                                Icon(
+                                    imageVector = Icons.Rounded.Check,
+                                    contentDescription = null,
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text("Sprawdź")
+                                Spacer(Modifier.width(8.dp))
+                            }
                         }
                     }
-                }
-            },
-            menuContent = { DropdownMenuItem(text = { Text("Poprzednie pytanie") }, onClick = {}) },
-        )
+                },
+                menuContent = {
+                    DropdownMenuItem(
+                        text = { Text("Poprzednie pytanie") },
+                        onClick = {})
+                },
+            )
+        }
     }
 }

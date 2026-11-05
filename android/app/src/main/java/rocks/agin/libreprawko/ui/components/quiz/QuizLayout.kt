@@ -1,6 +1,7 @@
 package rocks.agin.libreprawko.ui.components.quiz
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -69,7 +70,22 @@ fun QuizLayout() {
         ) {
             QuizHeader(modifier = Modifier.padding(end = 18.dp))
 
-            QuestionView(question, translation, selected) { new -> selected = new }
+            AnimatedContent(
+                targetState = currentQuestion,
+                transitionSpec = {
+                    val forward = targetState > initialState
+                    val dir =
+                        if (forward) AnimatedContentTransitionScope.SlideDirection.Left else AnimatedContentTransitionScope.SlideDirection.Right
+
+                    (slideIntoContainer(dir, tween(300)) + fadeIn(tween(300)))
+                        .togetherWith(
+                            slideOutOfContainer(dir, tween(300)) + fadeOut(tween(300))
+                        )
+                        .using(SizeTransform(clip = false))
+                }
+            ) { questionIndex ->
+                QuestionView(question, translation, selected) { new -> selected = new }
+            }
         }
 
         AnimatedContent(
@@ -97,6 +113,7 @@ fun QuizLayout() {
                         result = QuestionResult.Correct(0),
                         onNext = {
                             checkShown = !checkShown
+                            currentQuestion++
                         },
                     )
                 }

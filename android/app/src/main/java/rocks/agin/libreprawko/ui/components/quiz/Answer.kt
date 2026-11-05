@@ -37,7 +37,7 @@ import kotlin.math.roundToInt
 // https://github.com/sameerasw/essentials/blob/9d5ba3be85b9f06077fbcc842ea70a025a213041/app/src/main/java/com/sameerasw/essentials/ui/core/cards/IconToggleItem.kt
 @Composable
 fun Answer(
-    text: String,
+    text: String?,
     selected: Boolean,
     modifier: Modifier = Modifier,
     onOptionSelected: () -> Unit,
@@ -72,7 +72,8 @@ fun Answer(
                     } else {
                         MaterialTheme.colorScheme.surfaceContainerHigh
                     },
-                ).clickable(onClick = onOptionSelected, interactionSource = interactionSource)
+                )
+                .clickable(onClick = onOptionSelected, interactionSource = interactionSource)
                 .padding(horizontal = 16.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -86,15 +87,17 @@ fun Answer(
                     "$answerLetter.",
                     style = MaterialTheme.typography.labelLarge.merge(fontWeight = FontWeight.Bold),
                     color =
-                    contentsColor,
+                        contentsColor,
                 )
             }
-            EmphasizedText(
-                text,
-                emphasized = selected,
-                style = MaterialTheme.typography.labelLarge,
-                color = contentsColor,
-            )
+            text?.let {
+                EmphasizedText(
+                    text,
+                    emphasized = selected,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = contentsColor,
+                )
+            }
         }
         RadioButton(
             selected,

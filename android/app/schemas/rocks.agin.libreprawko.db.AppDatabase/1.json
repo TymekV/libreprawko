@@ -2,15 +2,21 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "eec5cf0bc8805cbef5889344565b6593",
+    "identityHash": "989c5f43ec39bec749d7082eebac4aad",
     "entities": [
       {
         "tableName": "questions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `type` TEXT NOT NULL, `correct_answer` TEXT NOT NULL, `media` TEXT, `media_type` TEXT, `points` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `question_number` INTEGER NOT NULL, `type` TEXT NOT NULL, `correct_answer` TEXT NOT NULL, `media` TEXT, `media_type` TEXT, `points` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "questionNumber",
+            "columnName": "question_number",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -98,7 +104,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eec5cf0bc8805cbef5889344565b6593')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '989c5f43ec39bec749d7082eebac4aad')"
     ]
   }
 }

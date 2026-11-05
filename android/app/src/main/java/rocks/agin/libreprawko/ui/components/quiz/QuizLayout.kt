@@ -26,6 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import rocks.agin.libreprawko.db.models.Question
+import rocks.agin.libreprawko.db.models.QuestionTranslation
+import rocks.agin.libreprawko.db.models.QuestionType
 import rocks.agin.libreprawko.quiz.QuestionResult
 import rocks.agin.libreprawko.ui.components.core.containers.RoundedCardContainer
 
@@ -34,6 +37,28 @@ fun QuizLayout() {
     var selected by remember { mutableIntStateOf(0) }
 
     var checkShown by remember { mutableStateOf(false) }
+
+    var currentQuestion by remember { mutableIntStateOf(0) }
+
+    val question =
+        Question(
+            id = 0,
+            questionNumber = 6333,
+            type = QuestionType.Specialist,
+            correctAnswer = "A",
+            media = null,
+            mediaType = null,
+            points = 3
+        )
+
+    val translation = QuestionTranslation(
+        id = 0,
+        questionId = 0,
+        question = "Z jaką maksymalną dopuszczalną prędkością możesz jechać na drodze za tym znakiem?",
+        answerA = "20 km/h",
+        answerB = "30 km/h",
+        answerC = "40 km/h"
+    )
 
     Column(
         modifier = Modifier.padding(top = 6.dp),
@@ -44,53 +69,7 @@ fun QuizLayout() {
         ) {
             QuizHeader(modifier = Modifier.padding(end = 18.dp))
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(horizontal = 18.dp),
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(top = 6.dp),
-                ) {
-                    Text(
-                        "Nr pytania: 6333 • 3 punkty",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-
-                    Text(
-                        "Z jaką maksymalną dopuszczalną prędkością możesz jechać na drodze za tym znakiem?",
-                        style =
-                            MaterialTheme.typography.titleLarge.merge(
-                                fontWeight = FontWeight.Medium,
-                            ),
-                    )
-                }
-
-                QuizImage(modifier = Modifier.weight(1f))
-
-                RoundedCardContainer {
-                    Answer(
-                        text = "20 km/h",
-                        selected = selected == 0,
-                        onOptionSelected = { selected = 0 },
-                        answerLetter = "A",
-                    )
-                    Answer(
-                        text = "30 km/h",
-                        selected = selected == 1,
-                        onOptionSelected = { selected = 1 },
-                        answerLetter = "B",
-                    )
-                    Answer(
-                        text = "40 km/h",
-                        selected = selected == 2,
-                        onOptionSelected = { selected = 2 },
-                        answerLetter = "C",
-                    )
-                }
-            }
-
+            QuestionView(question, translation, selected) { new -> selected = new }
         }
 
         AnimatedContent(

@@ -36,6 +36,7 @@ class MediaTypeConverter {
 @Entity(tableName = "questions")
 data class Question(
     @PrimaryKey val id: Int,
+    @ColumnInfo(name = "question_number") val questionNumber: Int,
     val type: QuestionType,
     @ColumnInfo(name = "correct_answer") val correctAnswer: String,
     val media: String?,

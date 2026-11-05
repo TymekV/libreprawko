@@ -34,7 +34,7 @@ import rocks.agin.libreprawko.quiz.QuestionResult
 import rocks.agin.libreprawko.ui.components.core.containers.RoundedCardContainer
 
 @Composable
-fun QuizLayout() {
+fun QuizLayout(mode: Mode = Mode.Check) {
     var selected by remember { mutableIntStateOf(0) }
 
     var checkShown by remember { mutableStateOf(false) }
@@ -112,7 +112,6 @@ fun QuizLayout() {
                     QuizCheck(
                         result = QuestionResult.Correct(0),
                         onNext = {
-                            checkShown = !checkShown
                             currentQuestion++
                         },
                     )
@@ -126,11 +125,16 @@ fun QuizLayout() {
                         .padding(top = 12.dp, bottom = 14.dp)
                 ) {
                     Controls(
-                        onPrevious = {},
-                        onNext = {
-                            checkShown = !checkShown
+                        onPrevious = {
+                            currentQuestion--
                         },
-                        mode = Mode.Check
+                        onNext = {
+                            when (mode) {
+                                Mode.Check -> checkShown = true
+                                Mode.Next -> currentQuestion++
+                            }
+                        },
+                        mode = mode
                     )
                 }
             }

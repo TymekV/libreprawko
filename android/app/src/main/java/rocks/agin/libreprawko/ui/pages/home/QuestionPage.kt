@@ -37,7 +37,7 @@ fun QuestionPage() {
                     .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            QuizLayout()
+            QuizLayout(mode = Mode.Next)
         }
     }
 }
